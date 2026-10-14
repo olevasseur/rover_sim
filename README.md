@@ -10,6 +10,10 @@ printed chassis and a battery bay.
   Collisions use simple boxes, cylinders and a sphere.
 - `launch/display.launch.py`: robot_state_publisher, joint_state_publisher_gui
   and RViz.
+- `launch/gazebo.launch.py`: the rover in Gazebo (Harmonic), driven by
+  ros2_control's `diff_drive_controller`.
+- `config/controllers.yaml`: controller settings (wheel size, speed limits).
+- `worlds/room.sdf`: a small 4 x 3 m room with a few obstacles.
 
 Frames: `base_footprint` (floor) -> `base_link` (on the drive axle) ->
 `left_wheel_link`, `right_wheel_link`, `caster_link`, plus empty
@@ -41,7 +45,25 @@ xacro src/rover_sim/urdf/rover.urdf.xacro > /tmp/rover.urdf
 check_urdf /tmp/rover.urdf
 ```
 
-Gazebo simulation is the next step.
+## Drive it in Gazebo
+
+```sh
+ros2 launch rover_sim gazebo.launch.py          # add rviz:=true to also open RViz
+```
+
+In a second terminal:
+
+```sh
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
+  -p stamped:=true -r cmd_vel:=/diff_drive_controller/cmd_vel
+```
+
+Keep the teleop terminal focused: `i` forward, `,` back, `j`/`l` turn,
+`k` stop. Top speed is limited to 0.3 m/s. Odometry is published on
+`/diff_drive_controller/odom` and as the `odom -> base_footprint` transform.
+
+Launch arguments: `world:=<file.sdf>`, `gui:=false` (headless),
+`x:=`, `y:=`, `yaw:=` (spawn pose).
 
 ## License
 
