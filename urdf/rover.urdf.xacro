@@ -11,6 +11,9 @@
 -->
 <robot name="rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <!-- true when spawned in Gazebo: adds ros2_control and physics settings. -->
+  <xacro:arg name="use_gazebo" default="false"/>
+
   <xacro:property name="PI" value="3.14159265358979"/>
   <xacro:property name="mm" value="0.001"/>
   <xacro:property name="mesh_scale" value="0.001 0.001 0.001"/>
@@ -355,5 +358,9 @@
     <child link="camera_link"/>
     <origin xyz="${camera_x} 0 ${camera_z - base_z}" rpy="0 0 0"/>
   </joint>
+
+  <xacro:if value="$(arg use_gazebo)">
+    <xacro:include filename="rover.gazebo.xacro"/>
+  </xacro:if>
 
 </robot>

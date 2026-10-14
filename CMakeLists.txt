@@ -4,7 +4,7 @@ project(rover_sim)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY launch meshes rviz urdf
+  DIRECTORY config launch meshes rviz urdf worlds
   DESTINATION share/${PROJECT_NAME}
 )
 
