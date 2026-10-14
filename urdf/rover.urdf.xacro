@@ -7,7 +7,8 @@
   base_link is directly above it, on the drive-wheel axle.
 
   All dimensions are in meters and kilograms. The CAD is drawn in millimeters,
-  so meshes are scaled by 0.001. Values marked "estimate" are not measured yet.
+  so meshes are scaled by 0.001. Masses and sensor dimensions are estimates,
+  typical or datasheet values until they are weighed or measured.
 -->
 <robot name="rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
@@ -43,14 +44,30 @@
   <xacro:property name="deck_length" value="${deck_x_max - deck_x_min}"/>
   <xacro:property name="deck_cx" value="${(deck_x_max + deck_x_min) / 2}"/>
 
+  <!-- Electronics deck. Its posts carry the compute deck above it. -->
   <xacro:property name="upper_x_min" value="${-100.0 * mm}"/>
   <xacro:property name="upper_x_max" value="${50.0 * mm}"/>
-  <xacro:property name="upper_width" value="${160.0 * mm}"/>
+  <xacro:property name="upper_y_min" value="${-80.0 * mm}"/>
+  <xacro:property name="upper_y_max" value="${100.0 * mm}"/>
   <xacro:property name="upper_t" value="${3.0 * mm}"/>
   <xacro:property name="upper_bottom_z" value="${114.0 * mm}"/>
   <xacro:property name="upper_length" value="${upper_x_max - upper_x_min}"/>
+  <xacro:property name="upper_width" value="${upper_y_max - upper_y_min}"/>
   <xacro:property name="upper_cx" value="${(upper_x_max + upper_x_min) / 2}"/>
+  <xacro:property name="upper_cy" value="${(upper_y_max + upper_y_min) / 2}"/>
   <xacro:property name="upper_top_z" value="${upper_bottom_z + upper_t}"/>
+
+  <!-- Compute deck: the Pi hangs under it, the speaker grille is its front
+       wall and the lidar mount sits on top. Collision covers the plate only. -->
+  <xacro:property name="compute_x_min" value="${-100.0 * mm}"/>
+  <xacro:property name="compute_x_max" value="${61.0 * mm}"/>
+  <xacro:property name="compute_width" value="${72.0 * mm}"/>
+  <xacro:property name="compute_t" value="${4.0 * mm}"/>
+  <xacro:property name="compute_bottom_z" value="${170.0 * mm}"/>
+  <xacro:property name="compute_top_z" value="${compute_bottom_z + compute_t}"/>
+  <xacro:property name="compute_cx" value="${(compute_x_max + compute_x_min) / 2}"/>
+  <!-- The compute deck mesh is centred on its full outline, grille included. -->
+  <xacro:property name="compute_mesh_x" value="${-19.5 * mm}"/>
 
   <!-- Front bumper arc, approximated by its bounding box. -->
   <xacro:property name="bumper_x_min" value="${35.0 * mm}"/>
@@ -76,49 +93,107 @@
   <xacro:property name="battery_x" value="${-52.5 * mm}"/>
   <xacro:property name="battery_z" value="${88.5 * mm}"/>
 
+  <!-- Raspberry Pi 3B+, hanging under the compute deck, components down.
+       The box is the board plus the parts below it. -->
+  <xacro:property name="pi_x_min" value="${-89.0 * mm}"/>
+  <xacro:property name="pi_x_max" value="${-4.0 * mm}"/>
+  <xacro:property name="pi_width" value="${56.0 * mm}"/>
+  <xacro:property name="pi_z_min" value="${145.6 * mm}"/>
+  <xacro:property name="pi_z_max" value="${164.0 * mm}"/>
+
+  <!-- Speaker behind the front grille, facing forward. -->
+  <xacro:property name="speaker_x_min" value="${41.0 * mm}"/>
+  <xacro:property name="speaker_x_max" value="${57.5 * mm}"/>
+  <xacro:property name="speaker_width" value="${76.0 * mm}"/>
+  <xacro:property name="speaker_z_min" value="${132.0 * mm}"/>
+  <xacro:property name="speaker_z_max" value="${166.0 * mm}"/>
+
   <!-- =========================================================== caster -->
   <!-- Swivel caster, modelled as a fixed sphere under the kingpin. -->
   <xacro:property name="caster_x" value="${-100.0 * mm}"/>
   <xacro:property name="caster_radius" value="${19.0 * mm}"/>   <!-- 38 mm (1.5 in) wheel -->
   <xacro:property name="caster_spacer_z" value="${52.4 * mm}"/>
 
-  <!-- ===================================================== sensor mounts -->
-  <!-- Estimates: no sensors are in the CAD yet. -->
-  <xacro:property name="lidar_x" value="${-25.0 * mm}"/>
-  <xacro:property name="lidar_z" value="${upper_top_z}"/>
-  <xacro:property name="camera_x" value="${50.0 * mm}"/>
-  <xacro:property name="camera_z" value="${130.0 * mm}"/>
+  <!-- ============================================================ lidar -->
+  <!-- RPLIDAR A1M8. Datasheet values, not measured yet. The lidar is mounted
+       with its motor tail pointing forward. The body is drawn as a simple
+       envelope: a base plate under a round scanning head. -->
+  <xacro:property name="lidar_x" value="${-25.0 * mm}"/>          <!-- spin axis -->
+  <xacro:property name="lidar_z" value="${223.0 * mm}"/>          <!-- scan plane -->
+  <xacro:property name="lidar_mount_x" value="${-18.375 * mm}"/>  <!-- mount mesh origin -->
+  <xacro:property name="lidar_base_z" value="${202.0 * mm}"/>     <!-- underside of the lidar base -->
+  <xacro:property name="lidar_base_x_min" value="${-60.24 * mm}"/>
+  <xacro:property name="lidar_base_length" value="${96.74 * mm}"/>
+  <xacro:property name="lidar_base_width" value="${70.28 * mm}"/>
+  <xacro:property name="lidar_base_t" value="${8.0 * mm}"/>       <!-- estimate -->
+  <xacro:property name="lidar_head_radius" value="${35.0 * mm}"/>
+  <xacro:property name="lidar_top_z" value="${234.5 * mm}"/>
+
+  <!-- ============================================================ camera -->
+  <!-- Space reserved between the decks; no camera chosen yet. -->
+  <xacro:property name="camera_x" value="${55.0 * mm}"/>
+  <xacro:property name="camera_z" value="${83.0 * mm}"/>
 
   <!-- ============================================================ masses -->
-  <!-- Printed parts: slicer estimates (PLA, 15 % infill). -->
+  <!-- Printed parts: slicer estimates (PLA, 15 % infill), or STL volume
+       x 0.80 g/cm3 for parts not sliced yet ("volume estimate"). -->
   <xacro:property name="lower_deck_mass" value="0.1246"/>
-  <xacro:property name="upper_deck_mass" value="0.0766"/>
+  <xacro:property name="upper_deck_mass" value="0.0967"/>      <!-- volume estimate -->
+  <xacro:property name="compute_deck_mass" value="0.0476"/>    <!-- volume estimate -->
+  <xacro:property name="lidar_mount_mass" value="0.0173"/>     <!-- volume estimate -->
   <xacro:property name="cradle_mass" value="0.0127"/>          <!-- each -->
   <xacro:property name="caster_spacer_mass" value="0.0058"/>
   <xacro:property name="bumper_mass" value="0.0277"/>
   <xacro:property name="wheel_mass" value="${0.0204 + 0.021}"/> <!-- PLA rim + TPU tyre -->
-  <!-- Purchased parts: estimates until weighed. -->
-  <xacro:property name="motor_mass" value="0.100"/>            <!-- each, estimate -->
-  <xacro:property name="electronics_mass" value="0.100"/>      <!-- boards, wiring; estimate -->
-  <xacro:property name="battery_mass" value="0.350"/>          <!-- estimate -->
-  <xacro:property name="caster_mass" value="0.030"/>           <!-- estimate -->
+  <!-- Purchased parts: datasheet or typical values until weighed. -->
+  <xacro:property name="motor_mass" value="0.100"/>            <!-- each -->
+  <xacro:property name="coupler_mass" value="0.012"/>          <!-- each, with screws -->
+  <xacro:property name="esp32_mass" value="0.030"/>            <!-- with breakout board -->
+  <xacro:property name="driver_mass" value="0.006"/>           <!-- each motor driver -->
+  <xacro:property name="buck_mass" value="0.025"/>
+  <xacro:property name="power_parts_mass" value="0.030"/>      <!-- connectors, capacitor, jack -->
+  <xacro:property name="pi_mass" value="0.050"/>
+  <xacro:property name="speaker_mass" value="0.035"/>          <!-- assumed -->
+  <xacro:property name="amp_mass" value="0.003"/>
+  <xacro:property name="lidar_mass" value="0.170"/>
+  <xacro:property name="lidar_usb_mass" value="0.015"/>        <!-- USB adapter + cable, assumed -->
+  <xacro:property name="wiring_mass" value="0.060"/>           <!-- wires + fasteners, assumed -->
+  <xacro:property name="battery_mass" value="0.350"/>          <!-- assumed -->
+  <xacro:property name="caster_mass" value="0.030"/>
 
-  <!-- base_link carries everything except the wheels and the caster. Its
-       inertia is a solid box over the chassis envelope, centred on the
-       mass-weighted centre of the main components. -->
-  <xacro:property name="base_mass" value="${lower_deck_mass + upper_deck_mass + 2 * cradle_mass
-      + caster_spacer_mass + bumper_mass + 2 * motor_mass + electronics_mass + battery_mass}"/>
-  <xacro:property name="base_com_x" value="${(lower_deck_mass * deck_cx + upper_deck_mass * upper_cx
-      + caster_spacer_mass * caster_x + bumper_mass * (bumper_x_min + bumper_x_max) / 2
-      + electronics_mass * upper_cx + battery_mass * battery_x) / base_mass}"/>
-  <xacro:property name="base_com_z" value="${(lower_deck_mass * (deck_bottom_z + deck_t / 2)
-      + upper_deck_mass * (upper_bottom_z + upper_t / 2)
-      + 2 * cradle_mass * cradle_z + caster_spacer_mass * caster_spacer_z
-      + bumper_mass * (bumper_z_min + bumper_z_max) / 2 + 2 * motor_mass * motor_z
-      + electronics_mass * (upper_top_z + 0.010) + battery_mass * battery_z) / base_mass}"/>
+  <!-- base_link carries everything except the wheels and the caster.
+       Each row is (mass, x, y, z) of one item's centre of mass, in the
+       base_footprint frame. Its inertia is a solid box over the chassis
+       envelope, centred on the combined centre of mass. -->
+  <xacro:property name="base_items" value="${[
+      (lower_deck_mass, deck_cx, 0, deck_bottom_z + deck_t / 2),
+      (upper_deck_mass, upper_cx, upper_cy / 2, upper_bottom_z + 8 * mm),
+      (compute_deck_mass, compute_cx + 10 * mm, 0, compute_top_z - 8 * mm),
+      (lidar_mount_mass, lidar_mount_x, 0, compute_top_z + 14 * mm),
+      (cradle_mass, 0, cradle_y, cradle_z),
+      (cradle_mass, 0, -cradle_y, cradle_z),
+      (caster_spacer_mass, caster_x, 0, caster_spacer_z),
+      (bumper_mass, (bumper_x_min + bumper_x_max) / 2, 0, (bumper_z_min + bumper_z_max) / 2),
+      (2 * motor_mass, 0, 0, motor_z),
+      (2 * coupler_mass, 0, 0, base_z),
+      (esp32_mass, -45 * mm, 66 * mm, 137.5 * mm),
+      (2 * driver_mass, 26 * mm, 0, 128 * mm),
+      (buck_mass, -54 * mm, -16 * mm, 129.5 * mm),
+      (power_parts_mass, -40 * mm, -50 * mm, upper_top_z + 6 * mm),
+      (pi_mass, (pi_x_min + pi_x_max) / 2, 0, 157 * mm),
+      (speaker_mass, (speaker_x_min + speaker_x_max) / 2, 0, (speaker_z_min + speaker_z_max) / 2),
+      (amp_mass, 24.5 * mm, 10 * mm, 164.7 * mm),
+      (lidar_mass, -17 * mm, 0, 207 * mm),
+      (lidar_usb_mass, -30 * mm, 0, 183 * mm),
+      (wiring_mass, -20 * mm, 0, 100 * mm),
+      (battery_mass, battery_x, 0, battery_z)]}"/>
+  <xacro:property name="base_mass" value="${python.sum(i[0] for i in base_items)}"/>
+  <xacro:property name="base_com_x" value="${python.sum(i[0] * i[1] for i in base_items) / base_mass}"/>
+  <xacro:property name="base_com_y" value="${python.sum(i[0] * i[2] for i in base_items) / base_mass}"/>
+  <xacro:property name="base_com_z" value="${python.sum(i[0] * i[3] for i in base_items) / base_mass}"/>
   <xacro:property name="base_box_x" value="${bumper_x_max - deck_x_min}"/>
   <xacro:property name="base_box_y" value="${deck_width}"/>
-  <xacro:property name="base_box_z" value="${upper_top_z - (motor_z - motor_radius)}"/>
+  <xacro:property name="base_box_z" value="${lidar_top_z - (motor_z - motor_radius)}"/>
 
   <!-- ======================================================== materials -->
   <material name="pla">
@@ -129,6 +204,12 @@
   </material>
   <material name="metal">
     <color rgba="0.60 0.62 0.66 1.0"/>
+  </material>
+  <material name="board">
+    <color rgba="0.10 0.45 0.20 1.0"/>
+  </material>
+  <material name="dark">
+    <color rgba="0.20 0.20 0.22 1.0"/>
   </material>
   <material name="battery">
     <color rgba="0.20 0.55 0.30 0.8"/>
@@ -186,13 +267,28 @@
       <material name="pla"/>
     </visual>
     <visual>
-      <origin xyz="${upper_cx} 0 ${upper_bottom_z - base_z}" rpy="0 0 0"/>
+      <origin xyz="${upper_cx} ${upper_cy} ${upper_bottom_z - base_z}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_dir}/upper_deck.stl" scale="${mesh_scale}"/>
       </geometry>
       <material name="pla"/>
     </visual>
-    <!-- The bumper and cradles are exported in their print orientation. -->
+    <visual>
+      <origin xyz="${compute_mesh_x} 0 ${compute_top_z - base_z}" rpy="${PI} 0 0"/>
+      <geometry>
+        <mesh filename="${mesh_dir}/compute_deck.stl" scale="${mesh_scale}"/>
+      </geometry>
+      <material name="pla"/>
+    </visual>
+    <visual>
+      <origin xyz="${lidar_mount_x} 0 ${compute_top_z - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${mesh_dir}/lidar_mount.stl" scale="${mesh_scale}"/>
+      </geometry>
+      <material name="pla"/>
+    </visual>
+    <!-- The bumper, cradles and compute deck are exported in their print
+         orientation. -->
     <visual>
       <origin xyz="${(bumper_x_min + bumper_x_max) / 2} 0 ${bumper_z_max - base_z}" rpy="${PI} 0 0"/>
       <geometry>
@@ -243,6 +339,34 @@
       </geometry>
       <material name="battery"/>
     </visual>
+    <visual>
+      <origin xyz="${(pi_x_min + pi_x_max) / 2} 0 ${(pi_z_min + pi_z_max) / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${pi_x_max - pi_x_min} ${pi_width} ${pi_z_max - pi_z_min}"/>
+      </geometry>
+      <material name="board"/>
+    </visual>
+    <visual>
+      <origin xyz="${(speaker_x_min + speaker_x_max) / 2} 0 ${(speaker_z_min + speaker_z_max) / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${speaker_x_max - speaker_x_min} ${speaker_width} ${speaker_z_max - speaker_z_min}"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <visual>
+      <origin xyz="${lidar_base_x_min + lidar_base_length / 2} 0 ${lidar_base_z + lidar_base_t / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lidar_base_length} ${lidar_base_width} ${lidar_base_t}"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <visual>
+      <origin xyz="${lidar_x} 0 ${(lidar_base_z + lidar_base_t + lidar_top_z) / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_head_radius}" length="${lidar_top_z - lidar_base_z - lidar_base_t}"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
 
     <collision>
       <origin xyz="${deck_cx} 0 ${deck_bottom_z + deck_t / 2 - base_z}" rpy="0 0 0"/>
@@ -251,9 +375,27 @@
       </geometry>
     </collision>
     <collision>
-      <origin xyz="${upper_cx} 0 ${upper_bottom_z + upper_t / 2 - base_z}" rpy="0 0 0"/>
+      <origin xyz="${upper_cx} ${upper_cy} ${upper_bottom_z + upper_t / 2 - base_z}" rpy="0 0 0"/>
       <geometry>
         <box size="${upper_length} ${upper_width} ${upper_t}"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="${compute_cx} 0 ${compute_bottom_z + compute_t / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${compute_x_max - compute_x_min} ${compute_width} ${compute_t}"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="${(speaker_x_min + speaker_x_max) / 2} 0 ${(speaker_z_min + speaker_z_max) / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${speaker_x_max - speaker_x_min} ${speaker_width} ${speaker_z_max - speaker_z_min}"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="${lidar_x} 0 ${(lidar_base_z + lidar_top_z) / 2 - base_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_head_radius}" length="${lidar_top_z - lidar_base_z}"/>
       </geometry>
     </collision>
     <collision>
@@ -276,7 +418,7 @@
     </collision>
 
     <xacro:box_inertial mass="${base_mass}" x="${base_box_x}" y="${base_box_y}" z="${base_box_z}">
-      <origin xyz="${base_com_x} 0 ${base_com_z - base_z}" rpy="0 0 0"/>
+      <origin xyz="${base_com_x} ${base_com_y} ${base_com_z - base_z}" rpy="0 0 0"/>
     </xacro:box_inertial>
   </link>
 
@@ -353,7 +495,11 @@
   </joint>
 
   <!-- ==================================================== sensor frames -->
-  <!-- Placeholders for future sensors; positions are estimates. -->
+  <!-- lidar_link sits on the scan centre: spin axis, at scan-plane height.
+       It is aligned with base_link (X forward). The A1M8 is mounted with its
+       motor tail forward, so check which way the driver's 0 degree points
+       before using real scans, and rotate this frame or set the driver's
+       flip option to match. camera_link is a placeholder for the lens. -->
   <link name="lidar_link"/>
 
   <joint name="lidar_joint" type="fixed">

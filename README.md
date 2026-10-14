@@ -1,8 +1,10 @@
 # rover_sim
 
 URDF model of a small differential-drive rover for ROS 2 Jazzy: two driven
-wheels (65 mm, 221.6 mm track) and a rear swivel caster, with a two-deck 3D
-printed chassis and a battery bay.
+wheels (65 mm, 221.6 mm track) and a rear swivel caster. The 3D printed
+chassis has three decks: the motor deck, an electronics deck, and a compute
+deck that carries a Raspberry Pi underneath, a front speaker and an RPLIDAR
+A1 on top. There is a bay for a battery.
 
 - `urdf/rover.urdf.xacro`: the model. Every dimension and mass is a xacro
   property at the top of the file.
@@ -18,10 +20,13 @@ printed chassis and a battery bay.
 
 Frames: `base_footprint` (floor) -> `base_link` (on the drive axle) ->
 `left_wheel_link`, `right_wheel_link`, `caster_link`, plus empty
-`lidar_link` and `camera_link` frames for future sensors.
+`lidar_link` (the lidar's scan centre) and `camera_link` (a placeholder)
+frames for future sensors.
 
-The caster is modelled as a fixed sphere. Masses of the motors, electronics,
-battery and caster, and the sensor positions, are estimates for now.
+The caster is modelled as a fixed sphere. Purchased parts (Pi, speaker,
+boards, lidar, battery) are drawn as simple boxes and cylinders. Their
+masses, the lidar dimensions and the camera position are datasheet values
+or estimates for now.
 
 ## Build
 
