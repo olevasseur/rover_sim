@@ -299,11 +299,22 @@
         </geometry>
         <material name="tyre"/>
       </visual>
+      <!-- In Gazebo a cylinder touches the floor along its edges, which makes
+           the rover turn about 9 % more than the wheel odometry reports. A
+           sphere touches at a single point in the wheel's centre plane, so
+           the simulated track width matches wheel_separation. -->
       <collision>
-        <origin xyz="0 0 0" rpy="${PI / 2} 0 0"/>
-        <geometry>
-          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-        </geometry>
+        <xacro:if value="$(arg use_gazebo)">
+          <geometry>
+            <sphere radius="${wheel_radius}"/>
+          </geometry>
+        </xacro:if>
+        <xacro:unless value="$(arg use_gazebo)">
+          <origin xyz="0 0 0" rpy="${PI / 2} 0 0"/>
+          <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+          </geometry>
+        </xacro:unless>
       </collision>
       <xacro:cylinder_y_inertial mass="${wheel_mass}" radius="${wheel_radius}" length="${wheel_width}"/>
     </link>

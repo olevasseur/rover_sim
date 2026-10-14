@@ -7,7 +7,8 @@ printed chassis and a battery bay.
 - `urdf/rover.urdf.xacro`: the model. Every dimension and mass is a xacro
   property at the top of the file.
 - `meshes/`: STL meshes of the printed parts, used for visuals only.
-  Collisions use simple boxes, cylinders and a sphere.
+  Collisions use simple boxes, cylinders and spheres. In Gazebo the wheels
+  collide as spheres, so turning matches the wheel odometry.
 - `launch/display.launch.py`: robot_state_publisher, joint_state_publisher_gui
   and RViz.
 - `launch/gazebo.launch.py`: the rover in Gazebo (Harmonic), driven by
