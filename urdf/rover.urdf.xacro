@@ -23,7 +23,7 @@
   <!-- ===================================================== drive wheels -->
   <xacro:property name="wheel_radius" value="${32.5 * mm}"/>     <!-- 61 mm rim + 3.5 mm TPU tyre -->
   <xacro:property name="wheel_width" value="${20.0 * mm}"/>
-  <xacro:property name="wheel_separation" value="${221.6 * mm}"/> <!-- track width, centre to centre -->
+  <xacro:property name="wheel_separation" value="${214.6 * mm}"/> <!-- track width, centre to centre -->
   <xacro:property name="wheel_x" value="0.0"/>
   <!-- The wheel mesh's inner face sits 10 mm inboard of the wheel centre;
        the tyre mesh's inner face sits 7.8 mm inboard. -->
@@ -38,7 +38,7 @@
        the name ends in _bl (base_link frame). -->
   <xacro:property name="deck_x_min" value="${-140.0 * mm}"/>
   <xacro:property name="deck_x_max" value="${55.0 * mm}"/>
-  <xacro:property name="deck_width" value="${192.0 * mm}"/>
+  <xacro:property name="deck_width" value="${186.0 * mm}"/>
   <xacro:property name="deck_t" value="${4.0 * mm}"/>
   <xacro:property name="deck_bottom_z" value="${58.0 * mm}"/>
   <xacro:property name="deck_length" value="${deck_x_max - deck_x_min}"/>
@@ -109,10 +109,16 @@
   <xacro:property name="speaker_z_max" value="${166.0 * mm}"/>
 
   <!-- =========================================================== caster -->
-  <!-- Swivel caster, modelled as a fixed sphere under the kingpin. -->
+  <!-- Swivel caster, 38 mm tall from the floor to the top of its plate,
+       modelled as a fixed sphere under the swivel axis. The wheel diameter
+       is an estimate until measured; the real contact point trails the
+       swivel axis by its offset. -->
   <xacro:property name="caster_x" value="${-100.0 * mm}"/>
-  <xacro:property name="caster_radius" value="${19.0 * mm}"/>   <!-- 38 mm (1.5 in) wheel -->
-  <xacro:property name="caster_spacer_z" value="${52.4 * mm}"/>
+  <xacro:property name="caster_radius" value="${12.5 * mm}"/>   <!-- 25 mm wheel, estimate -->
+  <xacro:property name="caster_height" value="${38.0 * mm}"/>
+  <xacro:property name="caster_spacer_h" value="${20.0 * mm}"/>
+  <!-- The spacer sits on the caster plate; its mesh origin is its bottom. -->
+  <xacro:property name="caster_spacer_z" value="${caster_height}"/>
 
   <!-- ============================================================ lidar -->
   <!-- RPLIDAR A1M8. Datasheet values, not measured yet. The lidar is mounted
@@ -142,9 +148,9 @@
   <xacro:property name="compute_deck_mass" value="0.0476"/>    <!-- volume estimate -->
   <xacro:property name="lidar_mount_mass" value="0.0173"/>     <!-- volume estimate -->
   <xacro:property name="cradle_mass" value="0.0127"/>          <!-- each -->
-  <xacro:property name="caster_spacer_mass" value="0.0058"/>
+  <xacro:property name="caster_spacer_mass" value="0.0104"/>   <!-- volume estimate -->
   <xacro:property name="bumper_mass" value="0.0277"/>
-  <xacro:property name="wheel_mass" value="${0.0204 + 0.021}"/> <!-- PLA rim + TPU tyre -->
+  <xacro:property name="wheel_mass" value="${0.0179 + 0.0147}"/> <!-- PLA rim + TPU tyre, volume estimates -->
   <!-- Purchased parts: datasheet or typical values until weighed. -->
   <xacro:property name="motor_mass" value="0.100"/>            <!-- each -->
   <xacro:property name="coupler_mass" value="0.012"/>          <!-- each, with screws -->
@@ -172,7 +178,7 @@
       (lidar_mount_mass, lidar_mount_x, 0, compute_top_z + 14 * mm),
       (cradle_mass, 0, cradle_y, cradle_z),
       (cradle_mass, 0, -cradle_y, cradle_z),
-      (caster_spacer_mass, caster_x, 0, caster_spacer_z),
+      (caster_spacer_mass, caster_x, 0, caster_spacer_z + caster_spacer_h / 2),
       (bumper_mass, (bumper_x_min + bumper_x_max) / 2, 0, (bumper_z_min + bumper_z_max) / 2),
       (2 * motor_mass, 0, 0, motor_z),
       (2 * coupler_mass, 0, 0, base_z),

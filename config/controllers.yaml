@@ -14,7 +14,7 @@ diff_drive_controller:
     right_wheel_names: ["right_wheel_joint"]
 
     # Must match wheel_separation and wheel_radius in urdf/rover.urdf.xacro.
-    wheel_separation: 0.2216
+    wheel_separation: 0.2146
     wheel_radius: 0.0325
 
     odom_frame_id: odom
