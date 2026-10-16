@@ -25,9 +25,10 @@ def generate_launch_description():
     robot_description = ParameterValue(
         Command(['xacro ', model, ' use_gazebo:=true']), value_type=str)
 
-    # -r starts the simulation running; -s runs the server without a window.
+    # -r starts the simulation running; -s runs the server without a window,
+    # and --headless-rendering lets the GPU lidar render without a display.
     gz_args = ['-r -v2 ', world,
-               PythonExpression(["'' if '", gui, "' == 'true' else ' -s'"])]
+               PythonExpression(["'' if '", gui, "' == 'true' else ' -s --headless-rendering'"])]
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(
@@ -49,10 +50,13 @@ def generate_launch_description():
                    '-z', '0.01', '-Y', LaunchConfiguration('yaw')],
     )
 
-    clock_bridge = Node(
+    # Gazebo -> ROS: the sim clock and the lidar scan.
+    bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+                   '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'],
+        parameters=[{'use_sim_time': True}],
     )
 
     joint_state_broadcaster = Node(
@@ -82,14 +86,14 @@ def generate_launch_description():
                               description='Open the Gazebo window'),
         DeclareLaunchArgument('rviz', default_value='false',
                               description='Also open RViz'),
-        DeclareLaunchArgument('x', default_value='-1.2', description='Spawn x [m]'),
-        DeclareLaunchArgument('y', default_value='-0.8', description='Spawn y [m]'),
+        DeclareLaunchArgument('x', default_value='-1.8', description='Spawn x [m]'),
+        DeclareLaunchArgument('y', default_value='0.0', description='Spawn y [m]'),
         DeclareLaunchArgument('yaw', default_value='0.0', description='Spawn heading [rad]'),
         # Lets Gazebo resolve package://rover_sim/meshes/... in the URDF.
         AppendEnvironmentVariable('GZ_SIM_RESOURCE_PATH', os.path.dirname(share)),
         gazebo,
         robot_state_publisher,
-        clock_bridge,
+        bridge,
         spawn,
         # Controllers can only load once the robot exists in Gazebo.
         RegisterEventHandler(OnProcessExit(target_action=spawn,

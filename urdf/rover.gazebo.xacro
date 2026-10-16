@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Gazebo-only parts of the rover: ros2_control hardware, the plugin that
-     runs the controllers inside Gazebo, and contact friction. -->
+     runs the controllers inside Gazebo, contact friction and the lidar. -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- 100 RPM gearmotor at the wheel: 100 * 2 * pi / 60 = 10.5 rad/s. -->
@@ -48,6 +48,46 @@
   <gazebo reference="caster_link">
     <mu1>0.01</mu1>
     <mu2>0.01</mu2>
+  </gazebo>
+
+  <!-- RPLIDAR A1M8 as a GPU lidar: 360 samples (1 degree), 0.15-12 m,
+       5.5 Hz. Frame and topic match what rplidar_ros publishes when it is
+       started with frame_id:=lidar_link, so the same nodes run on the real
+       rover. The ranges get 1 cm of Gaussian noise. -->
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <topic>scan</topic>
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <update_rate>5.5</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>${-pi}</min_angle>
+            <max_angle>${pi - 2 * pi / 360}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>0</min_angle>
+            <max_angle>0</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.15</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
   </gazebo>
 
 </robot>
