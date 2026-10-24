@@ -56,6 +56,9 @@
   <xacro:property name="upper_cx" value="${(upper_x_max + upper_x_min) / 2}"/>
   <xacro:property name="upper_cy" value="${(upper_y_max + upper_y_min) / 2}"/>
   <xacro:property name="upper_top_z" value="${upper_bottom_z + upper_t}"/>
+  <!-- The amp holder's dial wall stands 2 mm past the +Y edge, so the mesh
+       spans Y -80..102 and is centred at 11 mm, not on the plate. -->
+  <xacro:property name="upper_mesh_cy" value="${11.0 * mm}"/>
 
   <!-- Compute deck: the Pi hangs under it, the speaker grille is its front
        wall and the lidar mount sits on top. Collision covers the plate only. -->
@@ -144,23 +147,24 @@
   <!-- Printed parts: slicer estimates (PLA, 15 % infill), or STL volume
        x 0.80 g/cm3 for parts not sliced yet ("volume estimate"). -->
   <xacro:property name="lower_deck_mass" value="0.1246"/>
-  <xacro:property name="upper_deck_mass" value="0.0967"/>      <!-- volume estimate -->
+  <xacro:property name="upper_deck_mass" value="0.1048"/>      <!-- volume estimate, with the amp stop wall -->
   <xacro:property name="compute_deck_mass" value="0.0476"/>    <!-- volume estimate -->
   <xacro:property name="lidar_mount_mass" value="0.0173"/>     <!-- volume estimate -->
   <xacro:property name="cradle_mass" value="0.0127"/>          <!-- each -->
   <xacro:property name="caster_spacer_mass" value="0.0104"/>   <!-- volume estimate -->
   <xacro:property name="bumper_mass" value="0.0277"/>
   <xacro:property name="wheel_mass" value="${0.0179 + 0.0147}"/> <!-- PLA rim + TPU tyre, volume estimates -->
-  <!-- Purchased parts: datasheet or typical values until weighed. -->
-  <xacro:property name="motor_mass" value="0.100"/>            <!-- each -->
+  <!-- Purchased parts: "weighed" values are kitchen-scale readings (+/- 1 g);
+       the rest are datasheet or typical values until weighed. -->
+  <xacro:property name="motor_mass" value="0.100"/>            <!-- each, spec estimate (not arrived) -->
   <xacro:property name="coupler_mass" value="0.012"/>          <!-- each, with screws -->
-  <xacro:property name="esp32_mass" value="0.030"/>            <!-- with breakout board -->
-  <xacro:property name="driver_mass" value="0.006"/>           <!-- each motor driver -->
+  <xacro:property name="esp32_mass" value="0.041"/>            <!-- with breakout board, weighed -->
+  <xacro:property name="driver_mass" value="0.006"/>           <!-- each motor driver, weighed -->
   <xacro:property name="buck_mass" value="0.025"/>
   <xacro:property name="power_parts_mass" value="0.030"/>      <!-- connectors, capacitor, jack -->
-  <xacro:property name="pi_mass" value="0.050"/>
-  <xacro:property name="speaker_mass" value="0.035"/>          <!-- assumed -->
-  <xacro:property name="amp_mass" value="0.003"/>
+  <xacro:property name="pi_mass" value="0.050"/>               <!-- bare board, weighed -->
+  <xacro:property name="speaker_mass" value="0.025"/>          <!-- weighed -->
+  <xacro:property name="amp_mass" value="0.005"/>              <!-- PAM8403 board, weighed -->
   <xacro:property name="lidar_mass" value="0.170"/>
   <xacro:property name="lidar_usb_mass" value="0.015"/>        <!-- USB adapter + cable, assumed -->
   <xacro:property name="wiring_mass" value="0.060"/>           <!-- wires + fasteners, assumed -->
@@ -188,7 +192,7 @@
       (power_parts_mass, -40 * mm, -50 * mm, upper_top_z + 6 * mm),
       (pi_mass, (pi_x_min + pi_x_max) / 2, 0, 157 * mm),
       (speaker_mass, (speaker_x_min + speaker_x_max) / 2, 0, (speaker_z_min + speaker_z_max) / 2),
-      (amp_mass, 24.5 * mm, 10 * mm, 164.7 * mm),
+      (amp_mass, 15.75 * mm, 81.5 * mm, 128.5 * mm),
       (lidar_mass, -17 * mm, 0, 207 * mm),
       (lidar_usb_mass, -30 * mm, 0, 183 * mm),
       (wiring_mass, -20 * mm, 0, 100 * mm),
@@ -273,7 +277,7 @@
       <material name="pla"/>
     </visual>
     <visual>
-      <origin xyz="${upper_cx} ${upper_cy} ${upper_bottom_z - base_z}" rpy="0 0 0"/>
+      <origin xyz="${upper_cx} ${upper_mesh_cy} ${upper_bottom_z - base_z}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_dir}/upper_deck.stl" scale="${mesh_scale}"/>
       </geometry>
